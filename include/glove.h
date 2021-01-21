@@ -48,6 +48,7 @@ public:
     ~Glove();
     void connectionCheck();
     void calibration();
+	void gloveLoop();
     void handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& msg);
 };
 

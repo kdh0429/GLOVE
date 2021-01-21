@@ -7,7 +7,7 @@ Glove::Glove(/* args */)
 
 	allegro_pub = node.advertise<sensor_msgs::JointState>("allegroHand_0/joint_cmd", 100);	
 	qb_pub = node.advertise<trajectory_msgs::JointTrajectory>("qbhand1/control/qbhand1_synergy_trajectory_controller/command", 1000);
-	soft_sensor_sub = node.subscribe("hand_soft_sensor", 1000, handSoftSensorCallback);
+	soft_sensor_sub = node.subscribe<std_msgs::Float32MultiArray>("hand_soft_sensor", 1000, &Glove::handSoftSensorCallback, this);
 
 	leftSensors = Forte_GetSensors(leftGlove);
 	rightSensors = Forte_GetSensors(rightGlove);
@@ -21,7 +21,7 @@ Glove::~Glove()
 
 }
 
-void connectionCheck()
+void Glove::connectionCheck()
 {
 	unsigned char leftConnection = Forte_GetConnectionState(leftGlove);
 	unsigned char rightConnection = Forte_GetConnectionState(rightGlove);
@@ -34,7 +34,7 @@ void connectionCheck()
 	cout << "hand type: " << unsigned(Forte_GetHandType(rightGlove)) << endl;
 }
 
-void calibration()
+void Glove::calibration()
 {
 	//calibration
 	cout << "press enter to start calibration - right, flat";
@@ -58,7 +58,7 @@ void calibration()
 
 void Glove::handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
 {
-	int sensor_num = 5;
+	const int sensor_num = 5;
 	float threshold = 0.5;
 	float sensor_arr[sensor_num];
 	for (int i=0; i<sensor_num; i++)
@@ -71,7 +71,6 @@ void Glove::handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& 
 	//note : frequency of vibration, note= 1~127, int
 	//amplitude : 0~1, float
 
-	int actuatorID;
 	int note=127;
 	float amplitude=0.5;
 
@@ -86,7 +85,7 @@ void Glove::handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& 
 }
 
 
-void gloveLoop() 
+void Glove::gloveLoop()
 {
 	while (true) {
 		x[0] = rightSensors[1] - r[0];
@@ -150,9 +149,7 @@ void gloveLoop()
 		qb_pub.publish(qb_hand_joint_trajectory);
 		std::cout << "Right Hand: " << rightSensors[0] << " " << rightSensors[1] << " " << rightSensors[2] << " " << rightSensors[3] << " " << rightSensors[4] << " " << rightSensors[5] << " " << rightSensors[6] << " " << rightSensors[8] << " " << rightSensors[9] << endl;
 		//std::cout << "Left Hand: " << qb_hand_joint_trajectory.points[0].positions[0] << endl;
-
 	}
-	return 0;
 }
 
 
