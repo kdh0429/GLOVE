@@ -13,7 +13,7 @@ Glove::Glove(/* args */)
 	rightSensors = Forte_GetSensors(rightGlove);
 
 	connectionCheck();
-	calibration();
+	//calibration();
 }
 
 Glove::~Glove()
@@ -58,7 +58,7 @@ void Glove::calibration()
 
 void Glove::handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
 {
-	const int sensor_num = 5;
+	const int sensor_num = 6;
 	float threshold = 0.5;
 	float sensor_arr[sensor_num];
 	for (int i=0; i<sensor_num; i++)
@@ -72,14 +72,14 @@ void Glove::handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& 
 	//amplitude : 0~1, float
 
 	int note=127;
-	float amplitude=0.5;
+	float amplitude=1.0;
 
 	for (int i=0; i<sensor_num; i++)
 	{
 		if (sensor_arr[i] > threshold)
 		{
 			// vibrate i th actuator
-			Forte_SendHaptic(rightGlove, i, note, amplitude);
+			Forte_SendHaptic(leftGlove, i, note, amplitude);
 		}
 	}
 }
@@ -147,8 +147,9 @@ void Glove::gloveLoop()
 		*/
 		allegro_pub.publish(allegro_hand_joint_state);
 		qb_pub.publish(qb_hand_joint_trajectory);
-		std::cout << "Right Hand: " << rightSensors[0] << " " << rightSensors[1] << " " << rightSensors[2] << " " << rightSensors[3] << " " << rightSensors[4] << " " << rightSensors[5] << " " << rightSensors[6] << " " << rightSensors[8] << " " << rightSensors[9] << endl;
+		//std::cout << "Right Hand: " << rightSensors[0] << " " << rightSensors[1] << " " << rightSensors[2] << " " << rightSensors[3] << " " << rightSensors[4] << " " << rightSensors[5] << " " << rightSensors[6] << " " << rightSensors[8] << " " << rightSensors[9] << endl;
 		//std::cout << "Left Hand: " << qb_hand_joint_trajectory.points[0].positions[0] << endl;
+		ros::spinOnce();
 	}
 }
 
