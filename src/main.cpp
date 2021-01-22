@@ -1,46 +1,29 @@
-#include "DataGloveAPI.h"
-#include <iostream>
-#include "ros/ros.h"
-#include "sensor_msgs/JointState.h"
-#include "std_msgs/MultiArrayDimension.h"
-#include "trajectory_msgs/JointTrajectory.h"
-using namespace std;
-// last update : 0120
-
-int main(int argc, char* argv[]) {
+#include "glove.h"
+Glove::Glove(/* args */)
+{
 	// 0 : right hand, 1: left hand
-	DataGloveIO* leftGlove = Forte_CreateDataGloveIO(1, "");
-	DataGloveIO* rightGlove = Forte_CreateDataGloveIO(0, "");
-	ros::init(argc, argv, "GLOVE");
-	ros::NodeHandle node;
-	// ros::Publisher glove_pub = node.advertise<std_msgs::Float32MultiArray>("GLOVE", 1000);
-	ros::Publisher allegro_pub = node.advertise<sensor_msgs::JointState>("allegroHand_0/joint_cmd", 100);
-	ros::Publisher qb_pub = node.advertise<trajectory_msgs::JointTrajectory>("qbhand1/control/qbhand1_synergy_trajectory_controller/command", 1000);
+	leftGlove = Forte_CreateDataGloveIO(1, "");
+	rightGlove = Forte_CreateDataGloveIO(0, "");
 
-	float* leftSensors = Forte_GetSensors(leftGlove);
-	float* rightSensors = Forte_GetSensors(rightGlove);
-	float leftThumb;
-	float rightThumb;
+	allegro_pub = node.advertise<sensor_msgs::JointState>("allegroHand_0/joint_cmd", 100);	
+	qb_pub = node.advertise<trajectory_msgs::JointTrajectory>("qbhand1/control/qbhand1_synergy_trajectory_controller/command", 1000);
+	soft_sensor_sub = node.subscribe<std_msgs::Float32MultiArray>("hand_soft_sensor", 1000, &Glove::handSoftSensorCallback, this);
 
-	float left_sum;
-	float left_avg;
+	leftSensors = Forte_GetSensors(leftGlove);
+	rightSensors = Forte_GetSensors(rightGlove);
 
-	// classification: find coefficients of shape function for input x
-	float p[3] = { 0.55, 0.91, 0.28 }; // index: weight 0
-	float q[3] = { 0.04, 1.62, 0.23 }; // middle: weight 0.5
-	float r[3] = { 0.04, 0.95, 0.89 }; // ring: weight 0.7
-	// use r as origin
-	float alength = 0.796116;
-	float anorm[3] = { 0.640611, -0.050244, -0.76622 }; //p-r
-	float blength = 0.940479;
-	float bnorm[3] = { 0, 0.712403, -0.70177 }; // q-r
-	float andotbn = 0.5019162;
-	float ancrossbn = 0.864916;
-	float x[3] = { 0.0, 0.0, 0.0 }; // x-r
-	float xdotan, xdotbn  = 0.0;
-	float s, t = 0.0;
-	float ratio_p, ratio_q, ratio_r = 0.0;
+	connectionCheck();
+	//calibration();
+}
 
+Glove::~Glove()
+{
+
+}
+
+
+void Glove::connectionCheck()
+{
 	unsigned char leftConnection = Forte_GetConnectionState(leftGlove);
 	unsigned char rightConnection = Forte_GetConnectionState(rightGlove);
 
@@ -50,7 +33,10 @@ int main(int argc, char* argv[]) {
 
 	cout << "right connection state: " << unsigned(rightConnection) << endl;
 	cout << "hand type: " << unsigned(Forte_GetHandType(rightGlove)) << endl;
+}
 
+void Glove::calibration()
+{
 	//calibration
 	cout << "press enter to start calibration - right, flat";
 	getchar();
@@ -69,13 +55,38 @@ int main(int argc, char* argv[]) {
 	cout << "right, Fingers in - cali start \n";
 	Forte_CalibrateFingersIn(rightGlove);
 	cout << "right, Fingers in - cali complete \n";
-	//
+}
 
+void Glove::handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
+{
+	const int sensor_num = 6;
+	float threshold = 0.5;
+	float sensor_arr[sensor_num];
+	for (int i=0; i<sensor_num; i++)
+	{
+		sensor_arr[i] = msg->data[i];
+	}
 
+	//haptic feedback
+	//actuatorID : Thumb=0, Index=1, Middle=2, Ring=3, Pinky=4, Palm=5
+	//note : frequency of vibration, note= 1~127, int
+	//amplitude : 0~1, float
 
+	int note=127;
+	float amplitude=1.0;
 
-	sensor_msgs::JointState allegro_hand_joint_state;
-	trajectory_msgs::JointTrajectory qb_hand_joint_trajectory;
+	for (int i=0; i<sensor_num; i++)
+	{
+		if (sensor_arr[i] > threshold)
+		{
+			// vibrate i th actuator
+			Forte_SendHaptic(leftGlove, i, note, amplitude);
+		}
+	}
+}
+
+void Glove::gloveLoop()
+{
 	while (true) {
 		x[0] = rightSensors[1] - r[0];
 		x[1] = rightSensors[6] - r[1];
@@ -136,9 +147,18 @@ int main(int argc, char* argv[]) {
 		*/
 		allegro_pub.publish(allegro_hand_joint_state);
 		qb_pub.publish(qb_hand_joint_trajectory);
-		std::cout << "Right Hand: " << rightSensors[0] << " " << rightSensors[1] << " " << rightSensors[2] << " " << rightSensors[3] << " " << rightSensors[4] << " " << rightSensors[5] << " " << rightSensors[6] << " " << rightSensors[8] << " " << rightSensors[9] << endl;
+		//std::cout << "Right Hand: " << rightSensors[0] << " " << rightSensors[1] << " " << rightSensors[2] << " " << rightSensors[3] << " " << rightSensors[4] << " " << rightSensors[5] << " " << rightSensors[6] << " " << rightSensors[8] << " " << rightSensors[9] << endl;
 		//std::cout << "Left Hand: " << qb_hand_joint_trajectory.points[0].positions[0] << endl;
-
+		ros::spinOnce();
 	}
-	return 0;
+}
+
+
+int main(int argc, char** argv) {
+
+	ros::init(argc, argv, "GLOVE");
+    Glove glove;
+    glove.gloveLoop();
+
+    return 0;
 }
