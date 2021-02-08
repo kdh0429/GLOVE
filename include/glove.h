@@ -6,6 +6,11 @@
 #include "std_msgs/Int16MultiArray.h"
 #include "trajectory_msgs/JointTrajectory.h"
 #include "std_msgs/String.h"
+// #include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/QR>
+#include <Eigen/SVD>
+#include <Eigen/Core>
 using namespace std;
 
 class Glove
@@ -21,10 +26,7 @@ private:
     ros::Subscriber soft_sensor_sub;
     ros::Publisher allegro_key_pub;
     ros::Subscriber allegro_sub;
-    //glove_imu
-    ros::Publisher left_glove_imu_pub, right_glove_imu_pub;
-    std_msgs::Int16MultiArray left_gloveIMU,right_gloveIMU;
-    //end
+    
     float* leftSensors;
     float* rightSensors;
     
