@@ -7,7 +7,7 @@
 #include "trajectory_msgs/JointTrajectory.h"
 #include "std_msgs/String.h"
 #include "math.h"
-//
+//?????
 using namespace std;
 
 class Glove
