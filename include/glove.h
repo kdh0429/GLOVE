@@ -7,10 +7,15 @@
 #include "trajectory_msgs/JointTrajectory.h"
 #include "std_msgs/String.h"
 #include "math.h"
+
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/QR>
+#include <eigen3/Eigen/SVD>
+#include <eigen3/Eigen/Core>
 //?????
 
 using namespace std;
-
+using namespace Eigen;
 class Glove
 {
 private:
@@ -58,6 +63,11 @@ private:
 	float s, t = 0.0;
 	float ratio_p, ratio_q, ratio_r = 0.0;
     float x0, x1, x2, x3;
+    
+    MatrixXf index_tip_force;
+    MatrixXf finger_jaco;
+    MatrixXf index_joint_torque;
+
 
     sensor_msgs::JointState allegro_hand_joint_cmd;
 	trajectory_msgs::JointTrajectory qb_hand_joint_trajectory;
@@ -69,8 +79,10 @@ public:
     ~Glove();
     void connectionCheck();
     void calibration();
-	void gloveLoop();
+	void gloveLoop(); 
+    //void setJacobian();
     void handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& msg);
     void allegroStateSubCallback(const sensor_msgs::JointState::ConstPtr& msg);
+   
 };
 
