@@ -63,10 +63,18 @@ private:
 	float s, t = 0.0;
 	float ratio_p, ratio_q, ratio_r = 0.0;
     float x0, x1, x2, x3;
+<<<<<<< Updated upstream
     
     MatrixXf index_tip_force;
     MatrixXf finger_jaco;
     MatrixXf index_joint_torque;
+=======
+    float e0, e1, e2, e3;
+    
+    Eigen::MatrixXf index_tip_force;
+    Eigen::MatrixXf finger_jaco;
+    Eigen::MatrixXf index_joint_torque;
+>>>>>>> Stashed changes
 
 
     sensor_msgs::JointState allegro_hand_joint_cmd;
@@ -80,7 +88,11 @@ public:
     void connectionCheck();
     void calibration();
 	void gloveLoop(); 
+<<<<<<< Updated upstream
     //void setJacobian();
+=======
+    void setJacobian();
+>>>>>>> Stashed changes
     void handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& msg);
     void allegroStateSubCallback(const sensor_msgs::JointState::ConstPtr& msg);
    
