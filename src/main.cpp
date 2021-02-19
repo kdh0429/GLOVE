@@ -18,16 +18,11 @@ Glove::Glove(/* args */)
 	rightSensors = Forte_GetSensors(rightGlove);
 
 	connectionCheck();
-<<<<<<< Updated upstream
-	calibration();
-	//setJacobian();
-=======
 	cout << "connectionCheck() \n";
 	calibration();
 	cout << "calibration() \n";
 	setJacobian();
 	cout << "setJacobian() \n";
->>>>>>> Stashed changes
 }
 
 Glove::~Glove()
@@ -100,15 +95,6 @@ void Glove::handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& 
 }
 
 void Glove::setJacobian()
-<<<<<<< Updated upstream
-{
-	finger_jaco(3,4);
-    finger_jaco << - 54*sin(x0)*sin(x1) - (297*cos(x3)*(cos(x1)*sin(x0)*sin(x2) + cos(x2)*sin(x0)*sin(x1)))/10 - (297*sin(x3)*(cos(x1)*cos(x2)*sin(x0) - sin(x0)*sin(x1)*sin(x2)))/10 - (192*cos(x1)*sin(x0)*sin(x2))/5 - (192*cos(x2)*sin(x0)*sin(x1))/5, 54*cos(x0)*cos(x1) - (297*cos(x3)*(cos(x0)*sin(x1)*sin(x2) - cos(x0)*cos(x1)*cos(x2)))/10 - (297*sin(x3)*(cos(x0)*cos(x1)*sin(x2) + cos(x0)*cos(x2)*sin(x1)))/10 - (192*cos(x0)*sin(x1)*sin(x2))/5 + (192*cos(x0)*cos(x1)*cos(x2))/5, (192*cos(x0)*cos(x1)*cos(x2))/5 - (297*sin(x3)*(cos(x0)*cos(x1)*sin(x2) + cos(x0)*cos(x2)*sin(x1)))/10 - (192*cos(x0)*sin(x1)*sin(x2))/5 - (297*cos(x3)*(cos(x0)*sin(x1)*sin(x2) - cos(x0)*cos(x1)*cos(x2)))/10, - (297*cos(x3)*(cos(x0)*sin(x1)*sin(x2) - cos(x0)*cos(x1)*cos(x2)))/10 - (297*sin(x3)*(cos(x0)*cos(x1)*sin(x2) + cos(x0)*cos(x2)*sin(x1)))/10,
-                54*cos(x0)*sin(x1) + (297*cos(x3)*(cos(x0)*cos(x1)*sin(x2) + cos(x0)*cos(x2)*sin(x1)))/10 - (297*sin(x3)*(cos(x0)*sin(x1)*sin(x2) - cos(x0)*cos(x1)*cos(x2)))/10 + (192*cos(x0)*cos(x1)*sin(x2))/5 + (192*cos(x0)*cos(x2)*sin(x1))/5, 54*cos(x1)*sin(x0) + (297*cos(x3)*(cos(x1)*cos(x2)*sin(x0) - sin(x0)*sin(x1)*sin(x2)))/10 - (297*sin(x3)*(cos(x1)*sin(x0)*sin(x2) + cos(x2)*sin(x0)*sin(x1)))/10 + (192*cos(x1)*cos(x2)*sin(x0))/5 - (192*sin(x0)*sin(x1)*sin(x2))/5, (297*cos(x3)*(cos(x1)*cos(x2)*sin(x0) - sin(x0)*sin(x1)*sin(x2)))/10 - (297*sin(x3)*(cos(x1)*sin(x0)*sin(x2) + cos(x2)*sin(x0)*sin(x1)))/10 + (192*cos(x1)*cos(x2)*sin(x0))/5 - (192*sin(x0)*sin(x1)*sin(x2))/5,   (297*cos(x3)*(cos(x1)*cos(x2)*sin(x0) - sin(x0)*sin(x1)*sin(x2)))/10 - (297*sin(x3)*(cos(x1)*sin(x0)*sin(x2) + cos(x2)*sin(x0)*sin(x1)))/10,
-                0,                                                       - 54*sin(x1) - (192*cos(x1)*sin(x2))/5 - (192*cos(x2)*sin(x1))/5 - (297*cos(x3)*(cos(x1)*sin(x2) + cos(x2)*sin(x1)))/10 - (297*sin(x3)*(cos(x1)*cos(x2) - sin(x1)*sin(x2)))/10,                                               - (192*cos(x1)*sin(x2))/5 - (192*cos(x2)*sin(x1))/5 - (297*cos(x3)*(cos(x1)*sin(x2) + cos(x2)*sin(x1)))/10 - (297*sin(x3)*(cos(x1)*cos(x2) - sin(x1)*sin(x2)))/10,                                 - (297*cos(x3)*(cos(x1)*sin(x2) + cos(x2)*sin(x1)))/10 - (297*sin(x3)*(cos(x1)*cos(x2) - sin(x1)*sin(x2)))/10;
-	index_joint_torque(4,1);
-	cout << "check 1";
-=======
 {	
 	cout << "check 1\n";
 	finger_jaco.resize(3,4);
@@ -128,19 +114,10 @@ void Glove::setJacobian()
 	index_tip_force.resize(3,1);
 
 	cout << "check 5\n";
->>>>>>> Stashed changes
 }
 
 void Glove::allegroStateSubCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
-<<<<<<< Updated upstream
-	std::cout << "Right Hand effort: " << msg->effort[1] <<endl;
-	x0 = msg->effort[0];
-	x1 = msg->effort[1];
-	x2 = msg->effort[2];
-	x3 = msg->effort[3];
-	index_joint_torque << x0, x1, x2, x3;
-=======
 	//std::cout << "Right Hand effort: " << msg->effort[1] <<endl;
 	x0 = msg->position[0];
 	x1 = msg->position[1];
@@ -156,18 +133,12 @@ void Glove::allegroStateSubCallback(const sensor_msgs::JointState::ConstPtr& msg
 	e2 = msg->effort[2];
 	e3 = msg->effort[3];
 	index_joint_torque << e0, e1, e2, e3;
->>>>>>> Stashed changes
 	index_tip_force = finger_jaco * index_joint_torque;
 
 	// index_tip_force(4,1);
 	// index_tip_force << x0,x1,x2,x3;
-<<<<<<< Updated upstream
-
-	std::cout << index_tip_force;
-=======
 	//std::cout << index_tip_force.format(CommaInitFmt) << endl;
 	std::cout << "X: "<<index_tip_force(0,0) << " / Y: "<< index_tip_force(1,0) <<" / Z: " << index_tip_force(2,0) <<endl;
->>>>>>> Stashed changes
 }
 
 
@@ -175,53 +146,72 @@ void Glove::allegroStateSubCallback(const sensor_msgs::JointState::ConstPtr& msg
 void Glove::gloveLoop()
 {
 	while (true) {
-		x[0] = rightSensors[1] - r[0];
-		x[1] = rightSensors[6] - r[1];
-		x[2] = rightSensors[10] - r[2];
-		xdotan = x[0]*anorm[0] + x[1]*anorm[1] + x[2]*anorm[2];
-		xdotbn = x[0]*bnorm[0] + x[1]*bnorm[1] + x[2]*bnorm[2];
-		s = (xdotan - andotbn * xdotbn) / (1.0 - andotbn * andotbn);
-		t = (xdotbn - andotbn * xdotan) / (1.0 - andotbn * andotbn);
-		ratio_p = s/alength;
-		ratio_q = t/blength;
+		// x[0] = rightSensors[1] - r[0];
+		// x[1] = rightSensors[6] - r[1];
+		// x[2] = rightSensors[10] - r[2];
+		x[0] = rightSensors[2];
+		x[1] = rightSensors[4];
+		x[2] = rightSensors[6];
+
+		a = pqr_inv[0]*x[0]+pqr_inv[1]*x[1]+pqr_inv[2]*x[2];
+		b = pqr_inv[3]*x[0]+pqr_inv[4]*x[1]+pqr_inv[5]*x[2];
+		c = pqr_inv[6]*x[0]+pqr_inv[7]*x[1]+pqr_inv[8]*x[2];
+
+		ratio_p = a/(a+b+c);
+		ratio_q = b/(a+b+c);
 		ratio_r = 1.0 - ratio_p - ratio_q;
+
+		// xdotan = x[0]*anorm[0] + x[1]*anorm[1] + x[2]*anorm[2];
+		// xdotbn = x[0]*bnorm[0] + x[1]*bnorm[1] + x[2]*bnorm[2];
+		// s = (xdotan - andotbn * xdotbn) / (1.0 - andotbn * andotbn);
+		// t = (xdotbn - andotbn * xdotan) / (1.0 - andotbn * andotbn);
+		// ratio_p = s/alength;
+		// ratio_q = t/blength;
+		// ratio_r = 1.0 - ratio_p - ratio_q;
+
 
 		// glove sensor index 0~9 (total 10 for each hand)
 		// glove Thumb MCP-0, Thumb IP-1, Index MCP-2, Index PIP-3, ...
 		// robot hand: 4 for each finger / start from Index finger, inner-0, outter-1,2,3 ...
 		// robot hand : last 4 joint for Thumb
 		allegro_hand_joint_cmd.position.resize(16);
-		allegro_hand_joint_cmd.position[0] = 0.054;
-		allegro_hand_joint_cmd.position[1] = 0.097 +  rightSensors[2] * 1.5;
+		allegro_hand_joint_cmd.position[0] = -0.05;
+		allegro_hand_joint_cmd.position[1] = -0.02 +  rightSensors[2] * 1.5;
 		allegro_hand_joint_cmd.position[2] = rightSensors[3] * 1.5;
 		allegro_hand_joint_cmd.position[3] = rightSensors[3] * 1.5;
 
+		//fix finger - 0218
+		// allegro_hand_joint_cmd.position[4] = -0.0115;
+		// allegro_hand_joint_cmd.position[5] = 0.4084;
+		// allegro_hand_joint_cmd.position[6] = 0.3730;
+		// allegro_hand_joint_cmd.position[7] = -0.0357;
 
-		allegro_hand_joint_cmd.position[4] = -0.0115;
-		allegro_hand_joint_cmd.position[5] = 0.4084;
-		allegro_hand_joint_cmd.position[6] = 0.3730;
-		allegro_hand_joint_cmd.position[7] = -0.0357;
+		// allegro_hand_joint_cmd.position[8] = -0.5398;
+		// allegro_hand_joint_cmd.position[9] = -0.0084;
+		// allegro_hand_joint_cmd.position[10] = 0.5422;
+		// allegro_hand_joint_cmd.position[11] = -0.1001;
 
-		allegro_hand_joint_cmd.position[8] = -0.5398;
-		allegro_hand_joint_cmd.position[9] = -0.0084;
-		allegro_hand_joint_cmd.position[10] = 0.5422;
-		allegro_hand_joint_cmd.position[11] = -0.1001;
 
-		// allegro_hand_joint_cmd.position[4] = -0.138;
-		// allegro_hand_joint_cmd.position[5] = 0.396 + rightSensors[4] *1.5;//-0.1 + rightSensors[4] * 1.6;
-		// allegro_hand_joint_cmd.position[6] = rightSensors[5] * 1.5;
-		// allegro_hand_joint_cmd.position[7] = rightSensors[5] * 1.5;
+		allegro_hand_joint_cmd.position[4] = -0.0138;
+		allegro_hand_joint_cmd.position[5] = 0.2 + rightSensors[4] *1.5;//-0.1 + rightSensors[4] * 1.6;
+		allegro_hand_joint_cmd.position[6] = 0.1+ rightSensors[5] * 1.5;
+		allegro_hand_joint_cmd.position[7] = rightSensors[5] * 1.5;
 		
-		// allegro_hand_joint_cmd.position[8] = -0.521;
-		// allegro_hand_joint_cmd.position[9] = rightSensors[6] * 1.5;
-		// allegro_hand_joint_cmd.position[10] = rightSensors[7] * 1.5;
-		// allegro_hand_joint_cmd.position[11] = rightSensors[7] * 1.5;
+		allegro_hand_joint_cmd.position[8] = -0.521;
+		allegro_hand_joint_cmd.position[9] = rightSensors[6] * 1.5;
+		allegro_hand_joint_cmd.position[10] = rightSensors[7] * 1.5;
+		allegro_hand_joint_cmd.position[11] = rightSensors[7] * 1.5;
 
-		allegro_hand_joint_cmd.position[12] = 1.25; //0.1 + rightSensors[0] * 0.2;
-		allegro_hand_joint_cmd.position[13] = 0.0; //0.5 * ratio_q + 0.7 * ratio_r;
+		//allegro_hand_joint_cmd.position[12] = 1.25; 
+		//allegro_hand_joint_cmd.position[13] = 0.0;
+
+		allegro_hand_joint_cmd.position[12] = 1.25;
+		allegro_hand_joint_cmd.position[13] = -0.01 + 0.5 * ratio_q + 0.7 * ratio_r;
+		
 		//allegro_hand_joint_cmd.position[13] = 0.6+rightSensors[0] * 0.2;
-		allegro_hand_joint_cmd.position[14] = 0* rightSensors[0] * 1.5;
-		allegro_hand_joint_cmd.position[15] = 0* rightSensors[1] * 1.5;
+		//allegro_hand_joint_cmd.position[14] =  rightSensors[0] * 1.5;
+		allegro_hand_joint_cmd.position[14] =  rightSensors[1] * 1.5;
+		allegro_hand_joint_cmd.position[15] =  rightSensors[1] * 1.5;
 
 		//glove joint
 		rightIndex = (rightSensors[2]+rightSensors[3])/2;
