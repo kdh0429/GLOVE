@@ -12,7 +12,7 @@
 #include <eigen3/Eigen/QR>
 #include <eigen3/Eigen/SVD>
 #include <eigen3/Eigen/Core>
-//?????
+
 
 using namespace std;
 using namespace Eigen;
@@ -78,16 +78,36 @@ private:
     float a, b, c;
 	float ratio_p, ratio_q, ratio_r;
 
-
-
     //for jacobian
     float x0, x1, x2, x3;
+    float x_t0, x_t1, x_t2, x_t3;
     float e0, e1, e2, e3;
     
-    Eigen::MatrixXf index_tip_force;
-    Eigen::MatrixXf finger_jaco;
-    Eigen::MatrixXf index_joint_torque;
+    //force
+    float max_force_x = 150;
+    float max_force_y = 50;
+    float max_force_z = 150;
 
+    Eigen::MatrixXf index_tip_force;
+    float norm_index_tip_force;
+    Eigen::MatrixXf middle_tip_force;
+    float norm_middle_tip_force;
+    Eigen::MatrixXf ring_tip_force;
+    float norm_ring_tip_force;
+    Eigen::MatrixXf thumb_tip_force;
+    float norm_thumb_tip_force;
+
+    //jac, torque for 3 finger
+    Eigen::MatrixXf finger_jaco;
+    Eigen::MatrixXf finger_joint_torque;
+    //jac, torque for thumb
+    Eigen::MatrixXf thumb_jaco;
+    Eigen::MatrixXf thumb_joint_torque;
+
+    Eigen::MatrixXf t1;
+    Eigen::MatrixXf t2;
+    Eigen::MatrixXf hmat;
+    Eigen::MatrixXf rmat;
 
     sensor_msgs::JointState allegro_hand_joint_cmd;
 	trajectory_msgs::JointTrajectory qb_hand_joint_trajectory;
@@ -99,6 +119,12 @@ public:
     ~Glove();
     void connectionCheck();
     void calibration();
+    void j2j_simple();
+    void j2j_thumbrot();
+    void linear_mapping();
+    float norm(float force_x, float force_y, float force_z);
+    float thumb_norm(float force_x, float force_y, float force_z);
+    void haptic();
 	void gloveLoop(); 
     void setJacobian();
     void handSoftSensorCallback(const std_msgs::Float32MultiArray::ConstPtr& msg);
