@@ -28,8 +28,9 @@ private:
     float* leftSensors;
     float* rightSensors;
     
-	float left_sum;
-	float left_avg;
+	float left_sum_mcp;
+    float left_sum_pip;
+    
     float rightIndex;
 	float rightMiddle;
 	float rightRing;

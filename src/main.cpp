@@ -59,12 +59,13 @@ void Glove::calibration()
 
 void Glove::handSoftSensorCallback(const std_msgs::Float64MultiArray::ConstPtr& msg)
 {
-	const int sensor_num = 5;
-	float threshold = 40.0;
+	const int sensor_num = 10;
+	float threshold = 0.5;
+	float sensor_max = 4.0;
 	float sensor_arr[sensor_num];
 	for (int i=0; i<sensor_num; i++)
 	{
-		sensor_arr[sensor_num-1-i] = msg->data[i];
+		sensor_arr[i] = msg->data[i];
 	}
 	//haptic feedback
 	//actuatorID : Thumb=0, Index=1, Middle=2, Ring=3, Pinky=4, Palm=5
@@ -79,10 +80,31 @@ void Glove::handSoftSensorCallback(const std_msgs::Float64MultiArray::ConstPtr& 
 		if (sensor_arr[i] > threshold)
 		{
 			// vibrate i th actuator
-			Forte_SendHaptic(leftGlove, i, note, amplitude);
+			float sensor_cut = 0.0;
+			if (amplitude*sensor_arr[i]/sensor_max > 1.0)
+				sensor_cut = 1.0;
+			else
+				sensor_cut = amplitude*sensor_arr[i]/sensor_max;
+
+			if(i <5)
+			{
+				Forte_SendHaptic(leftGlove, i, note, sensor_cut);
+			}
+			else
+			{
+				Forte_SendHaptic(rightGlove, i-5, note, sensor_cut);
+			}
 		}
-		else{
-			Forte_SendHaptic(leftGlove, i, note, 0.0);
+		else
+		{
+			if(i <5)
+			{
+				Forte_SendHaptic(leftGlove, i, note, 0);
+			}
+			else
+			{
+				Forte_SendHaptic(rightGlove, i-5, note, 0);
+			}		
 		}
 	}
 }
@@ -122,17 +144,25 @@ void Glove::gloveLoop()
 		allegro_hand_joint_cmd.position[14] = rightSensors[0] * 1.5;
 		allegro_hand_joint_cmd.position[15] = rightSensors[1] * 1.5;
 
+		allegro_pub.publish(allegro_hand_joint_cmd);
+
 		qb_hand_joint_trajectory.joint_names.resize(1);
 		qb_hand_joint_trajectory.joint_names[0] = "qbhand1_synergy_joint";
 		qb_hand_joint_trajectory.points.resize(1);
 		qb_hand_joint_trajectory.points[0].positions.resize(1);
 
-		left_sum = leftSensors[2]+leftSensors[4]+leftSensors[6]+leftSensors[8];
-		left_avg = left_sum/2;
-		if (left_avg > 1.0)
-			left_avg = 1.0;
-		qb_hand_joint_trajectory.points[0].positions[0] = left_avg;
-		ros::Duration one_sec(0.3);
+		left_sum_mcp = leftSensors[2]+leftSensors[4]+leftSensors[6]+leftSensors[8];
+		left_sum_mcp /= 2.0;
+		left_sum_pip = leftSensors[3]+leftSensors[5]+leftSensors[7]+leftSensors[9];
+		left_sum_pip /= 2.0;
+
+		if (left_sum_mcp > 1.0)
+			left_sum_mcp = 1.0;
+		if (left_sum_pip > 1.0)
+			left_sum_pip = 1.0;
+			
+		qb_hand_joint_trajectory.points[0].positions[0] = max(left_sum_mcp,left_sum_pip);
+		ros::Duration one_sec(0.1);
 		qb_hand_joint_trajectory.points[0].time_from_start = one_sec;
 
 		qb_pub.publish(qb_hand_joint_trajectory);
