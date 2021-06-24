@@ -118,6 +118,7 @@ void Glove::allegroStateSubCallback(const sensor_msgs::JointState::ConstPtr& msg
 
 void Glove::gloveLoop()
 {
+	ros::Rate r(100);
 	while (true) {
 		// glove sensor index 0~9 (total 10 for each hand)
 		// glove Thumb MCP-0, Thumb IP-1, Index MCP-2, Index PIP-3, ...
@@ -167,6 +168,7 @@ void Glove::gloveLoop()
 
 		qb_pub.publish(qb_hand_joint_trajectory);
 		ros::spinOnce();
+		r.sleep();
 	}
 }
 
